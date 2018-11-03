@@ -8,6 +8,7 @@
 #include <pwd.h>
 #include <dirent.h>
 #include <string.h>
+#include <errno.h>
 
 void my_ls(char *dir_name){
 
@@ -15,6 +16,11 @@ void my_ls(char *dir_name){
 
 	DIR *d;
 	d = opendir(dir_name);
+	if (d == NULL){
+		printf("%s\n",strerror(errno));
+		
+		return;
+	}
 	struct dirent *entry;
 	entry = readdir(d);
 
@@ -22,15 +28,17 @@ void my_ls(char *dir_name){
 	
 	struct stat fileStat;
 	int s_size = 0;
-	printf("\nDirectories\n");
+	printf("\nDirectories:\n");
 	while (entry != NULL){ 
 		// printf("%s ",entry->d_name);
 		if (entry->d_type == DT_DIR){
 			printf("%s\n",entry->d_name);
 			if (strcmp(entry->d_name,".") != 0){
 				if (strcmp(entry->d_name,"..") != 0){
-
-					//my_ls(entry->d_name);
+					// char s[100];
+					// strcpy(s,"/");
+					// strcat(s,entry->d_name);
+					// my_ls(entry->d_name);
 				}
 			}
 		}
@@ -43,7 +51,7 @@ void my_ls(char *dir_name){
 
 	d = opendir(dir_name);
 	entry = readdir(d);
-	printf("Regular Files\n");
+	printf("Regular Files:\n");
 	while (entry != NULL){ 
 		// printf("%s\n",entry->d_name);
 		if (entry->d_type == DT_REG){
@@ -56,7 +64,13 @@ void my_ls(char *dir_name){
 	closedir(d);
 }
 
-int main(){
-	my_ls(".");
+int main(int argc, char *argv[]){
+	if (argc > 1){
+		my_ls(argv[1]);
+	}
+	else{
+		my_ls(".");
+	}
+
 	return 0;
 }
